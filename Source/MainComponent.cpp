@@ -8,6 +8,18 @@ MainComponent::MainComponent()
 
 MainComponent::~MainComponent()
 {
+    for (auto b : cellButtons)
+        b->setLookAndFeel(nullptr);
+
+    for (auto l : cellLabels)
+        l->setLookAndFeel(nullptr);
+
+    cellButtons.clear(true);
+    cellLabels.clear(true);
+
+    buttonSelectAll = nullptr;
+
+    setLookAndFeel(nullptr);
 }
 
 void MainComponent::Initialization()
@@ -38,12 +50,10 @@ void MainComponent::Initialization()
     {
         for (int j = 0; j < partsCount; j++)
         {
-            auto button = cellButtons.add(new juce::ToggleButton());
-            button->setColour(juce::ToggleButton::ColourIds::tickColourId, juce::Colours::whitesmoke);
-            button->setColour(juce::ToggleButton::ColourIds::textColourId, juce::Colours::whitesmoke);
-            button->setColour(juce::ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::whitesmoke);
+            auto button = cellButtons.add(new juce::ToggleButton());            
+            button->setLookAndFeel(&matrixLookAndFeel);
             addAndMakeVisible(button);
-            // button->addListener(this);
+            button->addListener(this);
 
             auto text = cellLabels.add(new juce::Label());            
             text->setFont(juce::Font(fontSize, juce::Font::plain));
@@ -53,6 +63,7 @@ void MainComponent::Initialization()
             text->setColour(juce::TextEditor::textColourId, juce::Colours::black);
             text->setColour(juce::TextEditor::backgroundColourId, juce::Colours::black);
             text->setText("123", juce::NotificationType::dontSendNotification);
+            text->setLookAndFeel(&matrixLookAndFeel);
             addAndMakeVisible(text);
             // text->addListener(this);
         }
@@ -63,18 +74,7 @@ void MainComponent::Initialization()
 
     // ========================================================================
     // Constants Initialization
-    //margin = 100;
-    //marginT = 20;
-    //maxWidth = 0;
-    //cellWidth = 60;
-    //cellHeight = 35;
-    //fontSize = 16;
-
-    //cellButtonWidth = 24;
-    //cellButtonHeight = 24;
-
-    //cellTextWidth = 32;
-    //cellTextHeight = 24;
+    
     // ========================================================================
     // Max Width Calculation
     auto tempWidth = 0;
@@ -89,9 +89,21 @@ void MainComponent::Initialization()
             maxWidth = tempWidth;
     }
     maxWidth = maxWidth + marginT * 2;
+
+    // ========================================================================
+    // Select All
+    buttonSelectAll.reset(new juce::ToggleButton("buttonSelectAll"));
+    buttonSelectAll->setButtonText(TRANS("Select all"));
+    buttonSelectAll->setColour(juce::ToggleButton::ColourIds::tickColourId, juce::Colour(0xffffffff));
+    buttonSelectAll->setColour(juce::ToggleButton::ColourIds::textColourId, juce::Colour(0xffbbbbbb));
+    buttonSelectAll->setColour(juce::ToggleButton::ColourIds::tickDisabledColourId, juce::Colour(0xffffffff));
+    buttonSelectAll->setLookAndFeel(&matrixLookAndFeel);
+    addAndMakeVisible(buttonSelectAll.get());
+    buttonSelectAll->addListener(this);
+    
     // ========================================================================
     // Set Component Size
-    setSize(margin * 2 + maxWidth + partsCount * cellWidth, margin * 2 + maxWidth + partsCount * cellHeight);
+    setSize(margin * 2 + maxWidth + partsCount * cellWidth, margin * 2 + maxWidth + partsCount * cellHeight);    
 }
 
 //==============================================================================
@@ -252,6 +264,26 @@ void MainComponent::resized()
                 cellTextWidth,
                 cellTextHeight
             );
+        }
+    }
+
+    // Select All
+    buttonSelectAll->setBounds(
+        (float)margin + (maxWidth - 100) * 0.5f + 10,
+        (float)margin + (maxWidth - 32) * 0.5f,
+        (float)100,
+        (float)32);
+}
+
+void MainComponent::buttonClicked(juce::Button* b)
+{
+    if (b == buttonSelectAll.get())
+    {
+        auto state = b->getToggleState();
+        for (int i = 0; i < cellButtons.size(); i++)
+        {
+            auto button = cellButtons[i];
+            button->setToggleState(state, juce::dontSendNotification);
         }
     }
 }
