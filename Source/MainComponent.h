@@ -62,7 +62,7 @@ public:
 private:
     //==============================================================================
     // Your private member variables go here...
-    int margin = 100;
+    int margin = 20;
     int marginT = 20;
     int maxWidth = 0;
     int cellWidth = 60;
@@ -82,6 +82,8 @@ private:
     std::unique_ptr<juce::ToggleButton> buttonSelectAll;
 
     MatrixLookAndFeel matrixLookAndFeel;
+
+    juce::OwnedArray<juce::StringArray> matrix;
 
     void Initialization();
 

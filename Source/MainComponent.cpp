@@ -25,6 +25,33 @@ MainComponent::~MainComponent()
 void MainComponent::Initialization()
 {
     // ========================================================================
+    // Matrix
+    juce::File fileToRead("C:\\!Projects\\JUCE\\juce-correlation-matrix\\Documents\\matrix.csv");
+
+    if (!fileToRead.existsAsFile())
+        return;  // File doesn't exist
+
+    juce::FileInputStream inputStream(fileToRead);
+
+    if (!inputStream.openedOk())
+        return;  // Failed to open
+
+    while (!inputStream.isExhausted())
+    {
+        juce::StringArray arr;
+        auto line = inputStream.readNextLine();
+        std::string str = line.toStdString();
+        size_t pos = 0;
+        std::string value;
+        while ((pos = str.find(",")) != std::string::npos) {
+            value = str.substr(0, pos);
+            str.erase(0, pos + 1);
+            arr.add(value);
+        }
+        matrix.add(&arr);
+    }
+
+    // ========================================================================
     // Parts
     parts.clearQuick();
     parts.add("Achsschenkel");
@@ -32,12 +59,22 @@ void MainComponent::Initialization()
     parts.add("Zugstrebe");
     parts.add("Federlenker");
     parts.add("Querlenker Oben");
+    parts.add("Querlenker Unten");
+    parts.add("Spurstange");
+    parts.add("Drehstab");
     parts.add("Drehstabgestaenge");
+    parts.add("Bremssattel");
+    parts.add("Federbein");
+    parts.add("Rad");
     parts.add("Spurstangenlenkungsbalg");
+    parts.add("Reifen");
     parts.add("Antriebswelle");
     parts.add("Antriebswellenbalg");
     parts.add("Antriebswellenschelle");
-
+    parts.add("Drehwinkelsensor");
+    parts.add("Lenkgetriebe");
+    parts.add("Rohbau");
+    // parts.add("Neues Bauteil");
     partsCount = parts.size();
 
     // ========================================================================
@@ -58,7 +95,12 @@ void MainComponent::Initialization()
             auto text = cellLabels.add(new juce::Label());            
             text->setFont(juce::Font(fontSize, juce::Font::plain));
             text->setJustificationType(juce::Justification::centredRight);
-            text->setEditable(true, true, false);
+            
+            if (i > j)
+                text->setEditable(true, true, false);
+            else
+                text->setEditable(false, false, false);
+            
             text->setColour(juce::Label::backgroundColourId, juce::Colours::black);
             text->setColour(juce::TextEditor::textColourId, juce::Colours::black);
             text->setColour(juce::TextEditor::backgroundColourId, juce::Colours::black);
@@ -102,8 +144,9 @@ void MainComponent::Initialization()
     buttonSelectAll->addListener(this);
     
     // ========================================================================
-    // Set Component Size
-    setSize(margin * 2 + maxWidth + partsCount * cellWidth, margin * 2 + maxWidth + partsCount * cellHeight);    
+    // Set Component Size    
+    setSize(margin * 2 + maxWidth + partsCount * cellWidth - marginT * 2,
+        margin * 2 + maxWidth + partsCount * cellHeight - marginT * 2);
 }
 
 //==============================================================================
@@ -230,8 +273,8 @@ void MainComponent::paint (juce::Graphics& g)
         2.0f);     
     
     // ========================================================================
-    g.setColour(juce::Colours::lightblue);    
-    g.drawRoundedRectangle(5, 5, getWidth() - 10, getHeight() - 10, 25.0f, 3.0f);
+    // g.setColour(juce::Colours::lightblue);    
+    // g.drawRoundedRectangle(5, 5, getWidth() - 10, getHeight() - 10, 25.0f, 3.0f);
 }
 
 void MainComponent::resized()
@@ -251,12 +294,15 @@ void MainComponent::resized()
             if (i == j)
                 continue;
 
-            cellButtons[i * partsCount + j]->setBounds(
-                (float)X0 + ((float)cellWidth - 2) * i,
-                (float)Y0 + ((float)cellHeight - 2) * j - 2 + H0,
-                cellButtonWidth,
-                cellButtonHeight
-            );
+            if (i > j)
+            {
+                cellButtons[i * partsCount + j]->setBounds(
+                    (float)X0 + ((float)cellWidth - 2) * i,
+                    (float)Y0 + ((float)cellHeight - 2) * j - 2 + H0,
+                    cellButtonWidth,
+                    cellButtonHeight
+                );
+            }
 
             cellLabels[i * partsCount + j]->setBounds(
                 (float)X0 + ((float)cellWidth - 2) * i + cellButtonWidth,
