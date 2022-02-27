@@ -18,6 +18,7 @@ MainComponent::~MainComponent()
     cellLabels.clear(true);
 
     buttonSelectAll = nullptr;
+    matrix.clear(true);
 
     setLookAndFeel(nullptr);
 }
@@ -25,8 +26,8 @@ MainComponent::~MainComponent()
 void MainComponent::Initialization()
 {
     // ========================================================================
-    // Matrix
-    juce::File fileToRead("C:\\!Projects\\JUCE\\juce-correlation-matrix\\Documents\\matrix.csv");
+    // Matrix    
+    juce::File fileToRead("D:\\Projects\\JUCE\\juce-correlation-matrix\\Documents\\matrix.csv");
 
     if (!fileToRead.existsAsFile())
         return;  // File doesn't exist
@@ -36,9 +37,10 @@ void MainComponent::Initialization()
     if (!inputStream.openedOk())
         return;  // Failed to open
 
+    juce::StringArray* arr;
     while (!inputStream.isExhausted())
     {
-        juce::StringArray arr;
+        arr = new juce::StringArray();
         auto line = inputStream.readNextLine();
         std::string str = line.toStdString();
         size_t pos = 0;
@@ -46,11 +48,10 @@ void MainComponent::Initialization()
         while ((pos = str.find(",")) != std::string::npos) {
             value = str.substr(0, pos);
             str.erase(0, pos + 1);
-            arr.add(value);
+            arr->add(value);
         }
-        matrix.add(&arr);
+        matrix.add(arr);
     }
-
     // ========================================================================
     // Parts
     parts.clearQuick();
@@ -85,26 +86,39 @@ void MainComponent::Initialization()
     // ========================================================================
     for (int i = 0; i < partsCount; i++)
     {
+        auto elem = matrix[i];
         for (int j = 0; j < partsCount; j++)
         {
+            auto str = elem->strings.getReference(j);
+            
+            // Check button
             auto button = cellButtons.add(new juce::ToggleButton());            
             button->setLookAndFeel(&matrixLookAndFeel);
-            addAndMakeVisible(button);
+            
+            if (str.length() > 0)
+                addAndMakeVisible(button);
+            else
+                addChildComponent(button);
+            
             button->addListener(this);
-
+            
+            // Text Label
             auto text = cellLabels.add(new juce::Label());            
             text->setFont(juce::Font(fontSize, juce::Font::plain));
             text->setJustificationType(juce::Justification::centredRight);
             
-            if (i > j)
+            if (j > i)
                 text->setEditable(true, true, false);
             else
+            {
+                str = cellLabels[j * partsCount + i]->getText(); // Transponent
                 text->setEditable(false, false, false);
-            
+            }   
+
             text->setColour(juce::Label::backgroundColourId, juce::Colours::black);
             text->setColour(juce::TextEditor::textColourId, juce::Colours::black);
             text->setColour(juce::TextEditor::backgroundColourId, juce::Colours::black);
-            text->setText("123", juce::NotificationType::dontSendNotification);
+            text->setText(str, juce::NotificationType::dontSendNotification);
             text->setLookAndFeel(&matrixLookAndFeel);
             addAndMakeVisible(text);
             // text->addListener(this);
@@ -223,14 +237,20 @@ void MainComponent::paint (juce::Graphics& g)
     // Cells    
     for (int i = 0; i < partsCount; i++)
     {
+        //auto elem = matrix[i];
         for (int j = 0; j < partsCount; j++)
         {
             if (i != j)
             {
-                g.setColour(juce::Colours::whitesmoke);
+                g.setColour(juce::Colours::lightgrey);
+                /*g.fillRect(
+                    (float)X0 + ((float)cellWidth - 2) * j - 2,
+                    (float)Y0 + ((float)cellHeight - 2) * i - 2,
+                    (float)cellWidth,
+                    (float)cellHeight);*/
                 g.drawRect(
-                    (float)X0 + ((float)cellWidth - 2) * i - 2,
-                    (float)Y0 + ((float)cellHeight - 2) * j - 2,
+                    (float)X0 + ((float)cellWidth - 2) * j - 2,
+                    (float)Y0 + ((float)cellHeight - 2) * i - 2,
                     (float)cellWidth,
                     (float)cellHeight,
                     2.0f);
@@ -246,15 +266,15 @@ void MainComponent::paint (juce::Graphics& g)
             {
                 g.setColour(juce::Colours::whitesmoke);
                 g.fillRect(
-                    (float)X0 + ((float)cellWidth - 2) * i - 2,
-                    (float)Y0 + ((float)cellHeight - 2) * j - 2,
+                    (float)X0 + ((float)cellWidth - 2) * j - 2,
+                    (float)Y0 + ((float)cellHeight - 2) * i - 2,
                     (float)cellWidth,
                     (float)cellHeight);
 
                 g.setColour(juce::Colours::whitesmoke);
                 g.drawRect(
-                    (float)X0 + ((float)cellWidth - 2) * i - 2,
-                    (float)Y0 + ((float)cellHeight - 2) * j - 2,
+                    (float)X0 + ((float)cellWidth - 2) * j - 2,
+                    (float)Y0 + ((float)cellHeight - 2) * i - 2,
                     (float)cellWidth,
                     (float)cellHeight,
                     2.0f);
@@ -293,20 +313,20 @@ void MainComponent::resized()
         {
             if (i == j)
                 continue;
-
-            if (i > j)
+            
+            if (j > i)
             {
                 cellButtons[i * partsCount + j]->setBounds(
-                    (float)X0 + ((float)cellWidth - 2) * i,
-                    (float)Y0 + ((float)cellHeight - 2) * j - 2 + H0,
+                    (float)X0 + ((float)cellWidth - 2) * j,
+                    (float)Y0 + ((float)cellHeight - 2) * i - 2 + H0,
                     cellButtonWidth,
                     cellButtonHeight
                 );
             }
 
             cellLabels[i * partsCount + j]->setBounds(
-                (float)X0 + ((float)cellWidth - 2) * i + cellButtonWidth,
-                (float)Y0 + ((float)cellHeight - 2) * j - 2 + H0,
+                (float)X0 + ((float)cellWidth - 2) * j + cellButtonWidth,
+                (float)Y0 + ((float)cellHeight - 2) * i - 2 + H0,
                 cellTextWidth,
                 cellTextHeight
             );
