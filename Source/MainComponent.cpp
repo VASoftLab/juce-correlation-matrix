@@ -92,7 +92,7 @@ void MainComponent::Initialization()
             auto str = elem->strings.getReference(j);
             
             // Check button
-            auto button = cellButtons.add(new juce::ToggleButton());            
+            auto button = cellButtons.add(new juce::ToggleButton());
             button->setLookAndFeel(&matrixLookAndFeel);
             
             if (str.length() > 0)
@@ -108,15 +108,18 @@ void MainComponent::Initialization()
             text->setJustificationType(juce::Justification::centredRight);
             
             if (j > i)
+            {
                 text->setEditable(true, true, false);
+                text->setLookAndFeel(&matrixLookAndFeelActive);
+            }
             else
             {
                 str = cellLabels[j * partsCount + i]->getText(); // Transponent
+                text->setLookAndFeel(&matrixLookAndFeel);
                 text->setEditable(false, false, false);
             }
 
-            text->setText(str, juce::NotificationType::dontSendNotification);
-            text->setLookAndFeel(&matrixLookAndFeel);
+            text->setText(str, juce::NotificationType::dontSendNotification);            
             if (str.length() > 0)
                 addAndMakeVisible(text);
             else
@@ -246,9 +249,9 @@ void MainComponent::paint (juce::Graphics& g)
                 if (i < j)
                 {
                     if (str.length() == 0)
-                        g.setColour(juce::Colours::darkgrey);
+                        g.setColour(juce::Colours::grey);
                     else
-                        g.setColour(juce::Colours::black);
+                        g.setColour(juce::Colours::lightgrey);
 
                     g.fillRect(
                         (float)X0 + ((float)cellWidth - 2) * j - 2,
@@ -257,7 +260,7 @@ void MainComponent::paint (juce::Graphics& g)
                         (float)cellHeight);                    
                 }
 
-                g.setColour(juce::Colours::lightgrey);
+                g.setColour(juce::Colours::whitesmoke);
                 g.drawRect(
                     (float)X0 + ((float)cellWidth - 2) * j - 2,
                     (float)Y0 + ((float)cellHeight - 2) * i - 2,

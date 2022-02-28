@@ -16,18 +16,14 @@ public:
         setColour(juce::ToggleButton::ColourIds::tickColourId, juce::Colours::yellow);
         setColour(juce::ToggleButton::ColourIds::textColourId, juce::Colours::whitesmoke);
         setColour(juce::ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::whitesmoke);
-
-        /*setColour(juce::Label::backgroundColourId, juce::Colours::lightgrey);
-        setColour(juce::Label::textColourId, juce::Colours::black);
-        setColour(juce::Label::textWhenEditingColourId, juce::Colours::black);
-        setColour(juce::TextEditor::backgroundColourId, juce::Colours::lightgrey);
-        setColour(juce::TextEditor::textColourId, juce::Colours::black);
-        setColour(juce::TextEditor::highlightedTextColourId, juce::Colours::black); */       
+        
+        setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::yellow);        
     }
 
     void MatrixLookAndFeel::drawToggleButton(juce::Graphics& g, juce::ToggleButton& button, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
     {
-        auto fontSize = juce::jmin(16.0f, (float)button.getHeight() * 0.75f);
+        float fontSizeA = 17;
+        auto fontSize = juce::jmin(fontSizeA, (float)button.getHeight() * 0.75f);
         auto tickWidth = fontSize * 1.1f;        
         drawTickBox(g, button, 4.0f, ((float)button.getHeight() - tickWidth) * 0.5f,
             tickWidth, tickWidth,
@@ -59,22 +55,39 @@ public:
 
         juce::Rectangle<float> tickBounds(x, y, w, h);
 
-        // g.setColour(component.findColour(juce::ToggleButton::tickDisabledColourId));
-        g.setColour(juce::Colours::orange);
+        g.setColour(juce::Colours::darkgrey);
         g.drawRoundedRectangle(tickBounds, 4.0f, 1.0f);
 
         if (ticked)
         {
-            // g.setColour(component.findColour(juce::ToggleButton::tickColourId));
-            g.setColour(juce::Colours::orange);
+            g.setColour(juce::Colours::darkgrey);
             auto tick = getTickShape(0.75f);
             g.fillPath(tick, tick.getTransformToScaleToFit(tickBounds.reduced(4, 5).toFloat(), false));
         }
     }
 };
 
+class MatrixLookAndFeelActive : public juce::LookAndFeel_V4
+{
+public:
+    MatrixLookAndFeelActive::MatrixLookAndFeelActive()
+    {
+        setColour(juce::ToggleButton::ColourIds::tickColourId, juce::Colours::yellow);
+        setColour(juce::ToggleButton::ColourIds::textColourId, juce::Colours::whitesmoke);
+        setColour(juce::ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::whitesmoke);
+
+        setColour(juce::Label::backgroundColourId, juce::Colours::lightgrey);
+        setColour(juce::Label::textColourId, juce::Colours::black);
+        setColour(juce::Label::textWhenEditingColourId, juce::Colours::black);
+        setColour(juce::TextEditor::backgroundColourId, juce::Colours::lightgrey);
+        setColour(juce::TextEditor::textColourId, juce::Colours::black);
+        setColour(juce::TextEditor::highlightedTextColourId, juce::Colours::black);
+    }
+};
+
 class MainComponent  : public juce::Component,
     private MatrixLookAndFeel,
+    private MatrixLookAndFeelActive,
     public juce::Button::Listener
 {
 public:
@@ -93,16 +106,19 @@ private:
     // Your private member variables go here...
     int margin = 20;
     int marginT = 20;
-    int maxWidth = 0;
-    int cellWidth = 60;
-    int cellHeight = 35;
+    int maxWidth = 0;    
     int partsCount = 0;
-    float fontSize = 16;
+    float fontSize = 17;
 
     int cellButtonWidth = 24;
     int cellButtonHeight = 24;
-    int cellTextWidth = 32;
+    int cellTextWidth = 24;
     int cellTextHeight = 24;
+
+    // int cellWidth = 60;
+    // int cellHeight = 35;
+    int cellWidth = cellButtonWidth + cellTextWidth + 4;
+    int cellHeight = 32;
 
     juce::StringArray parts;
     juce::OwnedArray<juce::ToggleButton> cellButtons;
@@ -111,6 +127,7 @@ private:
     std::unique_ptr<juce::ToggleButton> buttonSelectAll;
 
     MatrixLookAndFeel matrixLookAndFeel;
+    MatrixLookAndFeelActive matrixLookAndFeelActive;
 
     juce::OwnedArray<juce::StringArray> matrix;
 
