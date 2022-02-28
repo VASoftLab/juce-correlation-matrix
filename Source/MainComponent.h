@@ -16,13 +16,19 @@ public:
         setColour(juce::ToggleButton::ColourIds::tickColourId, juce::Colours::yellow);
         setColour(juce::ToggleButton::ColourIds::textColourId, juce::Colours::whitesmoke);
         setColour(juce::ToggleButton::ColourIds::tickDisabledColourId, juce::Colours::whitesmoke);
+
+        /*setColour(juce::Label::backgroundColourId, juce::Colours::lightgrey);
+        setColour(juce::Label::textColourId, juce::Colours::black);
+        setColour(juce::Label::textWhenEditingColourId, juce::Colours::black);
+        setColour(juce::TextEditor::backgroundColourId, juce::Colours::lightgrey);
+        setColour(juce::TextEditor::textColourId, juce::Colours::black);
+        setColour(juce::TextEditor::highlightedTextColourId, juce::Colours::black); */       
     }
 
     void MatrixLookAndFeel::drawToggleButton(juce::Graphics& g, juce::ToggleButton& button, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
     {
         auto fontSize = juce::jmin(16.0f, (float)button.getHeight() * 0.75f);
-        auto tickWidth = fontSize * 1.1f;
-
+        auto tickWidth = fontSize * 1.1f;        
         drawTickBox(g, button, 4.0f, ((float)button.getHeight() - tickWidth) * 0.5f,
             tickWidth, tickWidth,
             button.getToggleState(),
@@ -42,6 +48,29 @@ public:
             juce::Justification::centredLeft, 10);
     }
 
+    void MatrixLookAndFeel::drawTickBox(juce::Graphics& g, juce::Component& component,
+        float x, float y, float w, float h,
+        const bool ticked,
+        const bool isEnabled,
+        const bool shouldDrawButtonAsHighlighted,
+        const bool shouldDrawButtonAsDown)
+    {
+        juce::ignoreUnused(isEnabled, shouldDrawButtonAsHighlighted, shouldDrawButtonAsDown);
+
+        juce::Rectangle<float> tickBounds(x, y, w, h);
+
+        // g.setColour(component.findColour(juce::ToggleButton::tickDisabledColourId));
+        g.setColour(juce::Colours::orange);
+        g.drawRoundedRectangle(tickBounds, 4.0f, 1.0f);
+
+        if (ticked)
+        {
+            // g.setColour(component.findColour(juce::ToggleButton::tickColourId));
+            g.setColour(juce::Colours::orange);
+            auto tick = getTickShape(0.75f);
+            g.fillPath(tick, tick.getTransformToScaleToFit(tickBounds.reduced(4, 5).toFloat(), false));
+        }
+    }
 };
 
 class MainComponent  : public juce::Component,

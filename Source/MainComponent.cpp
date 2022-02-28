@@ -113,14 +113,14 @@ void MainComponent::Initialization()
             {
                 str = cellLabels[j * partsCount + i]->getText(); // Transponent
                 text->setEditable(false, false, false);
-            }   
+            }
 
-            text->setColour(juce::Label::backgroundColourId, juce::Colours::black);
-            text->setColour(juce::TextEditor::textColourId, juce::Colours::black);
-            text->setColour(juce::TextEditor::backgroundColourId, juce::Colours::black);
             text->setText(str, juce::NotificationType::dontSendNotification);
             text->setLookAndFeel(&matrixLookAndFeel);
-            addAndMakeVisible(text);
+            if (str.length() > 0)
+                addAndMakeVisible(text);
+            else
+                addChildComponent(text);            
             // text->addListener(this);
         }
     }
@@ -237,17 +237,27 @@ void MainComponent::paint (juce::Graphics& g)
     // Cells    
     for (int i = 0; i < partsCount; i++)
     {
-        //auto elem = matrix[i];
+        auto elem = matrix[i];
         for (int j = 0; j < partsCount; j++)
         {
+            auto str = elem->strings.getReference(j);
             if (i != j)
             {
+                if (i < j)
+                {
+                    if (str.length() == 0)
+                        g.setColour(juce::Colours::darkgrey);
+                    else
+                        g.setColour(juce::Colours::black);
+
+                    g.fillRect(
+                        (float)X0 + ((float)cellWidth - 2) * j - 2,
+                        (float)Y0 + ((float)cellHeight - 2) * i - 2,
+                        (float)cellWidth,
+                        (float)cellHeight);                    
+                }
+
                 g.setColour(juce::Colours::lightgrey);
-                /*g.fillRect(
-                    (float)X0 + ((float)cellWidth - 2) * j - 2,
-                    (float)Y0 + ((float)cellHeight - 2) * i - 2,
-                    (float)cellWidth,
-                    (float)cellHeight);*/
                 g.drawRect(
                     (float)X0 + ((float)cellWidth - 2) * j - 2,
                     (float)Y0 + ((float)cellHeight - 2) * i - 2,
@@ -255,15 +265,9 @@ void MainComponent::paint (juce::Graphics& g)
                     (float)cellHeight,
                     2.0f);
             }
-        }
-    }
-
-    for (int i = 0; i < partsCount; i++)
-    {
-        for (int j = 0; j < partsCount; j++)
-        {
-            if (i == j)
+            else
             {
+                // Main Diagonal
                 g.setColour(juce::Colours::whitesmoke);
                 g.fillRect(
                     (float)X0 + ((float)cellWidth - 2) * j - 2,
