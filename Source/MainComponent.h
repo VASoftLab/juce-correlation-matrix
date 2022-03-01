@@ -88,7 +88,8 @@ public:
 class MainComponent  : public juce::Component,
     private MatrixLookAndFeel,
     private MatrixLookAndFeelActive,
-    public juce::Button::Listener
+    public juce::Button::Listener,
+    public juce::Label::Listener
 {
 public:
     //==============================================================================
@@ -100,6 +101,9 @@ public:
     void resized() override;
 
     void buttonClicked(juce::Button* b) override;
+    void labelTextChanged(juce::Label* l) override;
+    void editorShown(juce::Label* l, juce::TextEditor& te) override;
+    void editorHidden(juce::Label* l, juce::TextEditor& te) override;
 
 private:
     //==============================================================================
@@ -119,6 +123,9 @@ private:
     // int cellHeight = 35;
     int cellWidth = cellButtonWidth + cellTextWidth + 4;
     int cellHeight = 32;
+
+    int selectedRowID = -1;
+    int selectedColID = -1;
 
     juce::StringArray parts;
     juce::OwnedArray<juce::ToggleButton> cellButtons;

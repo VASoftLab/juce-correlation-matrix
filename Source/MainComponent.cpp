@@ -124,7 +124,7 @@ void MainComponent::Initialization()
                 addAndMakeVisible(text);
             else
                 addChildComponent(text);            
-            // text->addListener(this);
+            text->addListener(this);
         }
     }
 
@@ -194,6 +194,16 @@ void MainComponent::paint (juce::Graphics& g)
             (float)maxWidth + 2,
             2.0f);
 
+        if (selectedColID == i)
+        {
+            g.setColour(juce::Colours::red);
+            g.fillRect(
+                (float)margin + (float)maxWidth + ((float)cellWidth - 2) * i + 2,
+                (float)margin + 2,
+                (float)cellWidth - 4,
+                (float)maxWidth - 2);
+        }
+
         glyph.clear();
         path.clear();
 
@@ -225,7 +235,17 @@ void MainComponent::paint (juce::Graphics& g)
             (float)maxWidth + 2,
             (float)cellHeight,
             2.0f);
-        
+
+        if (selectedRowID == i)
+        {
+            g.setColour(juce::Colours::red);
+            g.fillRect(
+                (float)margin + 2,
+                (float)margin + (float)maxWidth + ((float)cellHeight - 2) * i + 2,
+                (float)maxWidth - 2,
+                (float)cellHeight - 4);
+        }
+
         g.setColour(juce::Colours::whitesmoke);
         g.drawFittedText(
             parts[i],
@@ -246,9 +266,12 @@ void MainComponent::paint (juce::Graphics& g)
             auto str = elem->strings.getReference(j);
             if (i != j)
             {
+                // Background
                 if (i < j)
                 {
-                    if (str.length() == 0)
+                    if ((selectedRowID == i) && (selectedColID == j))
+                        g.setColour(juce::Colours::red);
+                    else if (str.length() == 0)
                         g.setColour(juce::Colours::grey);
                     else
                         g.setColour(juce::Colours::lightgrey);
@@ -259,7 +282,8 @@ void MainComponent::paint (juce::Graphics& g)
                         (float)cellWidth,
                         (float)cellHeight);                    
                 }
-
+                
+                // Border
                 g.setColour(juce::Colours::whitesmoke);
                 g.drawRect(
                     (float)X0 + ((float)cellWidth - 2) * j - 2,
@@ -359,4 +383,38 @@ void MainComponent::buttonClicked(juce::Button* b)
             button->setToggleState(state, juce::dontSendNotification);
         }
     }
+}
+
+void MainComponent::labelTextChanged(juce::Label* l)
+{
+    // Update cell in not edit area    
+}
+
+void MainComponent::editorShown(juce::Label* l, juce::TextEditor& te)
+{
+    for (int i = 0; i < partsCount; i++)
+    {
+        for (int j = 0; j < partsCount; j++)
+        {
+            if (l == cellLabels[i * partsCount + j])
+            {
+                selectedRowID = i;
+                selectedColID = j;
+            }
+        }
+    }
+
+    // Show Red Selection
+    l->setColour(juce::Label::backgroundColourId, juce::Colours::red);
+    repaint();
+}
+void MainComponent::editorHidden(juce::Label* l, juce::TextEditor& te)
+{
+    // Remove Red Selection
+    l->setColour(juce::Label::backgroundColourId, juce::Colours::lightgrey);
+    auto str = l->getText();
+    cellLabels[selectedColID * partsCount + selectedRowID]->setText(str, juce::NotificationType::dontSendNotification);
+    selectedRowID = -1;
+    selectedColID = -1;
+    repaint();
 }
