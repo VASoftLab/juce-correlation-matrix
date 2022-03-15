@@ -1,12 +1,12 @@
-#include "MainComponent.h"
+#include "CorrelationMatrixComponent.h"
 
 //==============================================================================
-MainComponent::MainComponent()
+CorrelationMatrixComponent::CorrelationMatrixComponent()
 {
     Initialization();    
 }
 
-MainComponent::~MainComponent()
+CorrelationMatrixComponent::~CorrelationMatrixComponent()
 {
     for (auto b : cellButtons)
         b->setLookAndFeel(nullptr);
@@ -23,7 +23,7 @@ MainComponent::~MainComponent()
     setLookAndFeel(nullptr);
 }
 
-void MainComponent::Initialization()
+void CorrelationMatrixComponent::Initialization()
 {
     // ========================================================================
     // Matrix    
@@ -167,7 +167,7 @@ void MainComponent::Initialization()
 }
 
 //==============================================================================
-void MainComponent::paint (juce::Graphics& g)
+void CorrelationMatrixComponent::paint (juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     // g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
@@ -328,7 +328,7 @@ void MainComponent::paint (juce::Graphics& g)
     // g.drawRoundedRectangle(5, 5, getWidth() - 10, getHeight() - 10, 25.0f, 3.0f);
 }
 
-void MainComponent::resized()
+void CorrelationMatrixComponent::resized()
 {
     // This is called when the MainComponent is resized.
     // If you add any child components, this is where you should
@@ -372,7 +372,7 @@ void MainComponent::resized()
         (float)32);
 }
 
-void MainComponent::buttonClicked(juce::Button* b)
+void CorrelationMatrixComponent::buttonClicked(juce::Button* b)
 {
     if (b == buttonSelectAll.get())
     {
@@ -385,12 +385,12 @@ void MainComponent::buttonClicked(juce::Button* b)
     }
 }
 
-void MainComponent::labelTextChanged(juce::Label* l)
+void CorrelationMatrixComponent::labelTextChanged(juce::Label* l)
 {
     // Update cell in not edit area    
 }
 
-void MainComponent::editorShown(juce::Label* l, juce::TextEditor& te)
+void CorrelationMatrixComponent::editorShown(juce::Label* l, juce::TextEditor& te)
 {
     for (int i = 0; i < partsCount; i++)
     {
@@ -408,7 +408,7 @@ void MainComponent::editorShown(juce::Label* l, juce::TextEditor& te)
     l->setColour(juce::Label::backgroundColourId, juce::Colours::red);
     repaint();
 }
-void MainComponent::editorHidden(juce::Label* l, juce::TextEditor& te)
+void CorrelationMatrixComponent::editorHidden(juce::Label* l, juce::TextEditor& te)
 {
     // Remove Red Selection
     l->setColour(juce::Label::backgroundColourId, juce::Colours::lightgrey);

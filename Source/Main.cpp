@@ -7,7 +7,7 @@
 */
 
 #include <JuceHeader.h>
-#include "MainComponent.h"
+#include "CorrelationMatrixComponent.h"
 
 //==============================================================================
 class NewProjectApplication  : public juce::JUCEApplication
@@ -65,7 +65,7 @@ public:
                               DocumentWindow::allButtons)
         {
             setUsingNativeTitleBar (true);
-            setContentOwned (new MainComponent(), true);
+            setContentOwned (new CorrelationMatrixComponent(), true);
 
            #if JUCE_IOS || JUCE_ANDROID
             setFullScreen (true);

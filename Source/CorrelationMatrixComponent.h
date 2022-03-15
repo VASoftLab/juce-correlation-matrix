@@ -85,7 +85,7 @@ public:
     }
 };
 
-class MainComponent  : public juce::Component,
+class CorrelationMatrixComponent  : public juce::Component,
     private MatrixLookAndFeel,
     private MatrixLookAndFeelActive,
     public juce::Button::Listener,
@@ -93,8 +93,8 @@ class MainComponent  : public juce::Component,
 {
 public:
     //==============================================================================
-    MainComponent();
-    ~MainComponent() override;
+    CorrelationMatrixComponent();
+    ~CorrelationMatrixComponent() override;
 
     //==============================================================================
     void paint (juce::Graphics&) override;
@@ -140,5 +140,5 @@ private:
 
     void Initialization();
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CorrelationMatrixComponent)
 };
